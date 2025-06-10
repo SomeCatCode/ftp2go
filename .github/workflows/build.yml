@@ -11,43 +11,67 @@ env:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
     - uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+
     - name: Build
       run: |
         go mod verify
         go build -v -o ftp2go ./...
         go vet ./...
+
+    - name: Archive Binary
+      run: |
+        TAG_NAME=${GITHUB_REF##*/}
+        ARCHIVE_NAME="ftp2go-${TAG_NAME}-linux.tar.gz"
+        tar -czf "$ARCHIVE_NAME" ftp2go
+        echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
+
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ftp2go-linux
-        path: ftp2go
+        name: linux-build
+        path: ${{ env.ARCHIVE_NAME }}
 
   build-windows:
     runs-on: windows-latest
+
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
     - uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+
     - name: Build
       run: |
         go mod verify
         go build -v -o ftp2go.exe ./...
         go vet ./...
+
+    - name: Archive Binary
+      shell: bash
+      run: |
+        TAG_NAME=${GITHUB_REF##*/}
+        ARCHIVE_NAME="ftp2go-${TAG_NAME}-windows.zip"
+        zip "$ARCHIVE_NAME" ftp2go.exe
+        echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ftp2go-windows
-        path: ftp2go.exe
+        name: windows-build
+        path: ${{ env.ARCHIVE_NAME }}
 
   release:
     runs-on: ubuntu-latest
@@ -57,17 +81,20 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
     - name: Download Linux Artifact
       uses: actions/download-artifact@v4
       with:
-        name: ftp2go-linux
+        name: linux-build
         path: ./release
+
     - name: Download Windows Artifact
       uses: actions/download-artifact@v4
       with:
-        name: ftp2go-windows
+        name: windows-build
         path: ./release
-    - name: Upload Release Assets
+
+    - name: Upload to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         files: ./release/*
