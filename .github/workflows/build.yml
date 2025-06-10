@@ -27,7 +27,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ftp2go-linux
-        paths: ftp2go
+        path: ftp2go
 
   build-windows:
     runs-on: windows-latest
@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ftp2go-windows
-        paths: ftp2go.exe
+        path: ftp2go.exe
 
   release:
     runs-on: ubuntu-latest
