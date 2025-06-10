@@ -86,13 +86,6 @@ func main() {
 		return
 	}
 
-	// Überprüfe die Leserechte im Root-Pfad.
-	_, err = os.ReadFile(testFile)
-	if err != nil && !os.IsNotExist(err) {
-		log.Fatalf("Keine Leserechte im Root-Pfad: %v, Fehler: %v", config.Root, err)
-		return
-	}
-
 	// Konfiguriere den FTP-Server mit den Einstellungen aus der Konfigurationsdatei.
 	factory := &filedriver.FileDriverFactory{
 		RootPath: config.Root,
