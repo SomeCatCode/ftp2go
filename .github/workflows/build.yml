@@ -1,7 +1,6 @@
 name: Go Build and Release
 
 on:
-  workflow_dispatch:
   push:
     tags:
       - 'v*'
@@ -12,48 +11,63 @@ env:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
     - uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
-
     - name: Build
       run: |
         go mod verify
         go build -v -o ftp2go ./...
         go vet ./...
-
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ftp2go
+        name: ftp2go-linux
         paths: ftp2go
 
   build-windows:
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
     - uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
-
     - name: Build
       run: |
         go mod verify
         go build -v -o ftp2go.exe ./...
         go vet ./...
-
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ftp2go.exe
+        name: ftp2go-windows
         paths: ftp2go.exe
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-linux, build-windows]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Download Linux Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ftp2go-linux
+        path: ./release
+    - name: Download Windows Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ftp2go-windows
+        path: ./release
+    - name: Upload Release Assets
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ./release/*
