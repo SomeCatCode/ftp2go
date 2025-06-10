@@ -6,31 +6,34 @@ on:
     tags:
       - 'v*'
 
+env:
+  GOVERSION: 1.24.3
+
 jobs:
+  matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        output: [ftp2go, ftp2go.exe]
 
-  build:
-    name: Build and Release
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
+    - uses: actions/checkout@v4
       with:
-        go-version: 1.21.1
+        fetch-depth: 0
 
-    - name: Verify dependencies
-      run: go mod verify
+    - uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GOVERSION }}
 
     - name: Build
-      run: go build -v -o ftp2go.exe ./...
-
-    - name: Run go vet
-      run: go vet ./...
-
-    - name: Archive production artifacts
+      run: |
+        go mod verify
+        go build -v -o ${{ matrix.output }} ./...
+        go vet ./...
+ 
+    - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: ftp2go.exe
-        path: ftp2go.exe
+        name: ${{ matrix.output }}
