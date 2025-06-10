@@ -1,4 +1,4 @@
-module ganjaaa/ftp2go
+module github.com/SomeCatCode/ftp2go
 
 go 1.21.1
 
