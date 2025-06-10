@@ -10,13 +10,8 @@ env:
   GOVERSION: 1.24.3
 
 jobs:
-  matrix:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        output: [ftp2go, ftp2go.exe]
-
-    runs-on: ${{ matrix.os }}
+  build-linux:
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -30,10 +25,35 @@ jobs:
     - name: Build
       run: |
         go mod verify
-        go build -v -o ${{ matrix.output }} ./...
+        go build -v -o ftp2go ./...
         go vet ./...
- 
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.output }}
+        name: ftp2go
+        paths: ftp2go
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GOVERSION }}
+
+    - name: Build
+      run: |
+        go mod verify
+        go build -v -o ftp2go.exe ./...
+        go vet ./...
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ftp2go.exe
+        paths: ftp2go.exe
