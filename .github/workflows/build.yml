@@ -64,7 +64,7 @@ jobs:
         $TAG_NAME = "${env:GITHUB_REF}".Split("/")[-1]
         $ARCHIVE_NAME = "ftp2go-$TAG_NAME-windows.zip"
         Compress-Archive -Path ftp2go.exe -DestinationPath $ARCHIVE_NAME
-        "$ARCHIVE_NAME" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        "ARCHIVE_NAME=$ARCHIVE_NAME" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
