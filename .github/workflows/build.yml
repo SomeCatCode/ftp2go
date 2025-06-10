@@ -60,7 +60,6 @@ jobs:
         go vet ./...
 
     - name: Archive Binary
-      shell: bash
       run: |
         TAG_NAME=${GITHUB_REF##*/}
         ARCHIVE_NAME="ftp2go-${TAG_NAME}-windows.zip"
