@@ -61,8 +61,8 @@ jobs:
 
     - name: Archive Binary
       run: |
-        TAG_NAME=${GITHUB_REF##*/}
-        ARCHIVE_NAME="ftp2go-${TAG_NAME}-windows.zip"
+        $TAG_NAME=${GITHUB_REF##*/}
+        $ARCHIVE_NAME="ftp2go-${TAG_NAME}-windows.zip"
         Compress-Archive -Path ftp2go.exe -DestinationPath "$ARCHIVE_NAME"
         echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
 
